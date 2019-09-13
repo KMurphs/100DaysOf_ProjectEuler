@@ -100,10 +100,58 @@ def get_largest_palindrome_from_product(digits):
 
 
 
+def isPalyndrom(a, b=None): 
+	if(b is not None):
+		up, low, union_help, isEven = split_number(a*b)
+	else:
+		up, low, union_help, isEven = split_number(a[0]*a[1])
+	return low == int(str(up)[::-1])
+
+def get_largest_palindrome_from_product_by_brute_force(digits):
+	N_max = int(math.pow(math.pow(10, digits) - 1, 2)) # Largest Product
+	N_min = int(math.pow(10, digits + 1)) # Lowest Product
+	print(f"Limits for potential palindroms are {N_min} and {N_max}")
+
+	up, low, union_help, isEven = split_number(N_max)
+
+	factors_low_limit = int(math.pow(10, digits - 1))
+	factors_high_limit = int(math.pow(10, digits) - 1)
+	print(f"Limits for potential factors are {factors_low_limit} and {factors_high_limit}")
+
+	palindroms = []
+
+
+
+	for potential_c_inv in range(0, factors_high_limit + 1 - factors_low_limit):
+		potential_c = factors_high_limit - potential_c_inv
+		# print(f"{potential_c} = {factors_high_limit} - {potential_c_inv}")
+
+		for potential_d_inv in range(0, factors_high_limit + 1 - potential_c):
+			potential_d = factors_high_limit - potential_d_inv
+
+			# print(f"Checking palindromness for factors {potential_c, potential_d} giving product {potential_c * potential_d}")
+			if(isPalyndrom(potential_c, potential_d)):
+				# print(f"Found palindrom {potential_c*potential_d} from {potential_c, potential_d} splitted in {split_number(potential_c*potential_d)}")
+				palindroms.append(potential_c*potential_d)
+				#return potential_c*potential_d, potential_c, potential_d
+
+
+
+	return max(palindroms)
+
+
 
 if __name__ == "__main__": 
+	digits = 4
+
 	start = time.time()
-	print(get_largest_palindrome_from_product(5))
+	print(get_largest_palindrome_from_product(digits))
+	#print(fermat_factorization(9009))
+	end = time.time()
+	print(f"Operation took {1000*(end - start):.2f}ms")
+
+	start = time.time()
+	print(get_largest_palindrome_from_product_by_brute_force(digits))
 	#print(fermat_factorization(9009))
 	end = time.time()
 	print(f"Operation took {1000*(end - start):.2f}ms")
