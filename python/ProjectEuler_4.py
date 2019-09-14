@@ -10,39 +10,43 @@ import random
 
 def split_number(N):
 
-	up = 0
-	low = 0
-	isEven = False
-	
+	# up = 0
+	# low = 0
 	N_temp = abs(N)
-	digits = 0
+	# digits = 0
 
-	while(N_temp > 0):
-		N_temp = N_temp // 10
-		digits = digits + 1
+	# while(N_temp > 0):
+	# 	N_temp = N_temp // 10
+	# 	digits = digits + 1
+
+	digits = len(str(N_temp))
+	splitter = math.pow(10, int(digits//2))
+	isEven = False
 
 	# print(f"Number {N} has {digits} digits")
 
 	if(digits % 2 == 0):
-		low = N % math.pow(10, digits//2)
-		up = N // math.pow(10, digits//2)
-		union_help = math.pow(10, digits//2)
+		low = N % splitter
+		up = N // splitter
 		isEven = True
 	else:
-		low = N % math.pow(10, 1 + int(digits//2))
-		up = N // math.pow(10, int(digits//2))	
-		union_help = math.pow(10, digits//2)
-		isEven = False
+		low = N % (splitter*10)
+		up = N // splitter
+		# isEven = False
 
 	# print(f"Number token are: {int(up), int(low), int(union_help)}")	
 
-	return int(up), int(low), int(union_help), isEven
+	return int(up), int(low), int(splitter), isEven
 
 
 def get_next_palindrome(up, low): 
 	up_rev = int(str(up)[::-1])
 	# print(f"Next Palyndrome is: {(up, up_rev) if up_rev <= low else (up - 1, int(str(up - 1)[::-1]))}")
 	return (up, up_rev) if up_rev <= low else (up - 1, int(str(up - 1)[::-1]))
+
+def get_next_palindrome_without_check(up, low): 
+	# print(f"Next Palyndrome is: {(up, up_rev) if up_rev <= low else (up - 1, int(str(up - 1)[::-1]))}")
+	return (up - 1, int(str(up - 1)[::-1]))
 
 
 def fermat_factorization(N):
@@ -65,9 +69,22 @@ def fermat_factorization(N):
 
 	return c == N, c, d
 
+def trial_factorization(N):
+	N_sqrt = math.sqrt(N)
+	a = int(N_sqrt + 1)
+	b = math.sqrt(a*a - N)
 
-def get_largest_palindrome_from_product(digits):
-	N_max = int(math.pow(math.pow(10, digits) - 1, 2)) # Largest Product
+	# print(f"N is: {N}, a and asquare: {a, a*a}, b and bsquare is {b, b*b}")
+	while(N % a != 0):
+		a -= 1
+		# print(f"N is: {N}, a and asquare: {a, a*a}, b and bsquare is {b, b*b}")	
+
+	return a == 1, int(N/a), a
+
+
+def get_largest_palindrome_from_product(digits, useFermatFactorization=True):
+	# N_max = int(math.pow(math.pow(10, digits) - 1, 2)) # Largest Product
+	N_max = int(math.pow(10, 2*digits) - 1) # Largest Palindrom
 	N_min = int(math.pow(10, digits + 1)) # Lowest Product
 	print(f"Limits for potential palindroms are {N_min} and {N_max}")
 
@@ -82,12 +99,16 @@ def get_largest_palindrome_from_product(digits):
 	while(not isValid and N_new >= N_min):
 		# print(f"\n\n")
 
-		up, low = get_next_palindrome(up, low-1)
+		# up, low = get_next_palindrome(up, low-1)
+		up, low = get_next_palindrome_without_check(up, low-1)
 
 		N_new = int((up if isEven else up // 10) * union_help) + low
 		# print(f"New Number is: {N_new} from {up} and {low} using union helper {union_help} and eveness {isEven}")
 
-		isPrime, c, d = fermat_factorization(N_new)
+		if(useFermatFactorization):
+			isPrime, c, d = fermat_factorization(N_new)
+		else:
+			isPrime, c, d = trial_factorization(N_new)
 		# print(f"New Number is{' ' if isPrime else ' not '}prime. Factors {c} and {d}")
 
 		isValid = (c >= factors_low_limit) & (c <= factors_high_limit) & (d >= factors_low_limit) & (d <= factors_high_limit)
@@ -101,14 +122,12 @@ def get_largest_palindrome_from_product(digits):
 
 
 def isPalyndrom(a, b=None): 
-	if(b is not None):
-		up, low, union_help, isEven = split_number(a*b)
-	else:
-		up, low, union_help, isEven = split_number(a[0]*a[1])
+	up, low, _, _ = split_number(a*b if b is not None else a[0]*a[1])
 	return low == int(str(up)[::-1])
 
 def get_largest_palindrome_from_product_by_brute_force(digits):
-	N_max = int(math.pow(math.pow(10, digits) - 1, 2)) # Largest Product
+	# N_max = int(math.pow(math.pow(10, digits) - 1, 2)) # Largest Product
+	N_max = int(math.pow(10, 2*digits) - 1) # Largest Palindrom
 	N_min = int(math.pow(10, digits + 1)) # Lowest Product
 	print(f"Limits for potential palindroms are {N_min} and {N_max}")
 
@@ -116,7 +135,7 @@ def get_largest_palindrome_from_product_by_brute_force(digits):
 
 	factors_low_limit = int(math.pow(10, digits - 1))
 	factors_high_limit = int(math.pow(10, digits) - 1)
-	print(f"Limits for potential factors are {factors_low_limit} and {factors_high_limit}")
+	# print(f"Limits for potential factors are {factors_low_limit} and {factors_high_limit}")
 
 	palindroms = []
 
@@ -139,22 +158,25 @@ def get_largest_palindrome_from_product_by_brute_force(digits):
 
 
 
-	return "undefined"
+	return "OOps! Something unexpected happened... Can't compute the largest palindrom by brute force for some obscure reason"
 
 
 
 if __name__ == "__main__": 
-	digits = 3
+	digits = 5
 
 	start = time.time()
 	print(get_largest_palindrome_from_product(digits))
-	#print(fermat_factorization(9009))
+	end = time.time()
+	print(f"Operation took {1000*(end - start):.2f}ms")
+
+	start = time.time()
+	print(get_largest_palindrome_from_product(digits, False))
 	end = time.time()
 	print(f"Operation took {1000*(end - start):.2f}ms")
 
 	start = time.time()
 	print(get_largest_palindrome_from_product_by_brute_force(digits))
-	#print(fermat_factorization(9009))
 	end = time.time()
 	print(f"Operation took {1000*(end - start):.2f}ms")
 
