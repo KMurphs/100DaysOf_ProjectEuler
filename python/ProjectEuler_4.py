@@ -121,28 +121,30 @@ def get_largest_palindrome_from_product_by_brute_force(digits):
 	palindroms = []
 
 
+	for counter in range(0, int(2 * factors_high_limit)):
+		for potential_c in range(int(counter / -2), 1):
+			potential_c_translated = int(potential_c + factors_high_limit)
+			potential_d_translated = int((-1*potential_c_translated) + (2*factors_high_limit) - counter)
+			# print(f"Counter, potential_c, potential_c_translated, potential_d_translated: {counter, potential_c, potential_c_translated, potential_d_translated}")
 
-	for potential_c_inv in range(0, factors_high_limit + 1 - factors_low_limit):
-		potential_c = factors_high_limit - potential_c_inv
-		# print(f"{potential_c} = {factors_high_limit} - {potential_c_inv}")
+			if(potential_c_translated <= factors_low_limit | potential_d_translated <= factors_low_limit):
+				continue
 
-		for potential_d_inv in range(0, factors_high_limit + 1 - potential_c):
-			potential_d = factors_high_limit - potential_d_inv
 
-			# print(f"Checking palindromness for factors {potential_c, potential_d} giving product {potential_c * potential_d}")
-			if(isPalyndrom(potential_c, potential_d)):
+			# print(f"Checking palindromness for factors {potential_c_translated, potential_d_translated} giving product {potential_c_translated * potential_d_translated}")
+			if(isPalyndrom(potential_c_translated, potential_d_translated)):
 				# print(f"Found palindrom {potential_c*potential_d} from {potential_c, potential_d} splitted in {split_number(potential_c*potential_d)}")
-				palindroms.append(potential_c*potential_d)
-				#return potential_c*potential_d, potential_c, potential_d
+				return potential_c_translated*potential_d_translated, potential_c_translated, potential_d_translated
 
 
 
-	return max(palindroms)
+
+	return "undefined"
 
 
 
 if __name__ == "__main__": 
-	digits = 4
+	digits = 3
 
 	start = time.time()
 	print(get_largest_palindrome_from_product(digits))
