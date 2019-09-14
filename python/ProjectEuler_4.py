@@ -21,7 +21,6 @@ def split_number(N):
 
 	digits = len(str(N_temp))
 	splitter = math.pow(10, int(digits//2))
-	isEven = False
 
 	# print(f"Number {N} has {digits} digits")
 
@@ -32,7 +31,7 @@ def split_number(N):
 	else:
 		low = N % (splitter*10)
 		up = N // splitter
-		# isEven = False
+		isEven = False
 
 	# print(f"Number token are: {int(up), int(low), int(union_help)}")	
 
